@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إدارة سيريا بايك</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#2a1140">
+<meta name="apple-mobile-web-app-title" content="إدارة سيريا بايك">
+<style>
+  body { margin:0; font-family:Arial,sans-serif; background:#f4f4f4; padding-bottom:20px; }
+  header { background:#4a148c; color:white; padding:16px; text-align:center; font-size:22px; font-weight:bold; }
+  #loginBox { padding:20px; }
+  #loginBox h2 { text-align:center; color:#4a148c; }
+  #loginBox input { width:100%; box-sizing:border-box; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:8px; font-size:16px; }
+  #loginBox button { width:100%; padding:14px; border:none; border-radius:10px; background:#4a148c; color:white; font-size:17px; font-weight:bold; }
+  #loginErr { color:#c62828; text-align:center; margin-top:10px; }
+  #app { display:none; }
+  .topBtns { display:flex; gap:8px; margin:10px 12px 0 12px; }
+  .topBtns button { background:white; color:#4a148c; border:none; padding:8px 14px; border-radius:8px; font-weight:bold; }
+  .warn { background:#fff3e0; color:#e65100; padding:10px; border-radius:8px; margin:8px 12px; font-size:14px; }
+  .hint { color:#666; font-size:13px; margin-bottom:8px; }
+  .stats { display:flex; flex-wrap:wrap; gap:8px; padding:12px; }
+  .stat { flex:1 1 40%; background:white; border-radius:12px; padding:10px; text-align:center; font-size:14px; }
+  .stat b { display:block; font-size:18px; color:#4a148c; margin-top:4px; }
+  .tabs { display:flex; gap:8px; padding:0 12px; }
+  .tabs button { flex:1; padding:12px; border:none; border-radius:10px; background:white; font-size:16px; font-weight:bold; }
+  .tabs button.active { background:#4a148c; color:white; }
+  .box { padding:12px; }
+  .card { background:white; border-radius:12px; padding:14px; margin-bottom:10px; }
+  .card h3 { margin:0 0 6px 0; }
+  .line { padding:3px 0; color:#444; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:13px; margin-bottom:6px; }
+  .new { background:#ffe0b2; color:#e65100; }
+  .cooking { background:#fff9c4; color:#f57f17; }
+  .ready { background:#bbdefb; color:#1565c0; }
+  .onway { background:#e1bee7; color:#6a1b9a; }
+  .delivered { background:#c8e6c9; color:#2e7d32; }
+  .active-sub { background:#c8e6c9; color:#2e7d32; }
+  .expired-sub { background:#ffcdd2; color:#c62828; }
+  .add { background:white; border-radius:12px; padding:14px; margin-bottom:12px; }
+  .add input, .add select { width:100%; box-sizing:border-box; padding:12px; margin-bottom:8px; border:1px solid #ccc; border-radius:8px; font-size:16px; }
+  .add button { width:100%; padding:12px; border:none; border-radius:8px; background:#4a148c; color:white; font-size:16px; font-weight:bold; }
+  .btn { padding:10px 14px; border:none; border-radius:8px; color:white; font-size:15px; margin-top:6px; margin-left:6px; }
+  .pay { background:#2e7d32; }
+  .del { background:#c62828; }
+  .empty { text-align:center; color:#888; padding:30px; }
+</style>
+  <link rel="stylesheet" href="premium.css">
+  <style>header{background:linear-gradient(120deg,#1a0a2a,#2a1140 70%,#4a1a68)!important;border-bottom-color:#F3D007!important}</style>
+</head>
+<body>
+<header>⚙️ Syria Bike Command Center</header>
+
+<div id="loginBox">
+  <h2>تسجيل دخول المدير</h2>
+  <input id="email" type="email" placeholder="الإيميل">
+  <input id="pass" type="password" placeholder="كلمة السر">
+  <button id="loginBtn">دخول</button>
+  <div id="loginErr"></div>
+</div>
+
+<div id="app">
+  <div class="topBtns">
+    <button id="logout">خروج</button>
+  </div>
+  <div id="banner"></div>
+  <div class="stats">
+    <div class="stat">كل الطلبات<b id="sOrders">0</b></div>
+    <div class="stat">قيد التنفيذ<b id="sActive">0</b></div>
+    <div class="stat">المبيعات المسلّمة<b id="sSales">0</b></div>
+    <div class="stat">اشتراكات مفعّلة<b id="sSubs">0</b></div>
+    <div class="stat">دخلكم من الاشتراكات المفعّلة<b id="sIncome">0</b></div>
+  </div>
+  <div class="tabs">
+    <button id="t1" class="active" data-tab="1">الطلبات</button>
+    <button id="t2" data-tab="2">المحلات والسائقين</button>
+  </div>
+  <div class="box">
+    <div id="addBox" style="display:none">
+      <div class="add">
+        <input id="nm" placeholder="الاسم (متل ما بدك الزبون يشوفه)">
+        <input id="em" type="email" placeholder="إيميل دخوله">
+        <select id="tp"><option value="shop">محل / مطعم (10 دولار)</option><option value="driver">سائق (5 دولار)</option></select>
+        <div class="hint">أنشئ حساب هالإيميل من فايربيس (Authentication) قبل ما تضيفه هون.</div>
+        <button data-act="addMember">إضافة</button>
+      </div>
+    </div>
+    <div id="listBox"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, onSnapshot, doc, deleteDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDh6GFQR5CzjnRLsrTS5FhWrHRZmLG5QSc",
+  authDomain: "syria-bike.firebaseapp.com",
+  projectId: "syria-bike",
+  storageBucket: "syria-bike.firebasestorage.app",
+  messagingSenderId: "417884008874",
+  appId: "1:417884008874:web:f95dc7c3886c765b3bbbd3"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const SHOP_FEE_USD = 10;
+const DRIVER_FEE_USD = 5;
+const USD_RATE = 20000;
+const DAY = 24 * 60 * 60 * 1000;
+const labels = {new:'طلب جديد', cooking:'قيد التحضير', ready:'جاهز للاستلام', onway:'في الطريق', delivered:'تم التوصيل'};
+
+let allOrders = [];
+let members = [];
+let current = 1;
+let unsubs = [];
+
+function $(id) { return document.getElementById(id); }
+function fmt(x) { return Math.round(x).toLocaleString('ar-SY') + ' ل.س'; }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function isActive(m) { return m.paidUntil && m.paidUntil > Date.now(); }
+function dateText(ms) { return new Date(ms).toLocaleDateString('ar-SY'); }
+
+function onErr(err) {
+  console.error(err);
+  $('banner').innerHTML = '<div class="warn">⚠️ ما عندك صلاحية. سجّل دخول بإيميل المدير فقط.</div>';
+}
+
+function startListening() {
+  if (unsubs.length) return;
+  $('banner').innerHTML = '';
+  unsubs.push(onSnapshot(collection(db, 'orders'), function(snap) {
+    allOrders = snap.docs.map(function(d) { const o = d.data(); o.id = d.id; return o; });
+    allOrders.sort(function(a, b) {
+      const ta = a.createdAt ? a.createdAt.seconds : 0;
+      const tb = b.createdAt ? b.createdAt.seconds : 0;
+      return tb - ta;
+    });
+    render();
+  }, onErr));
+  unsubs.push(onSnapshot(collection(db, 'members'), function(snap) {
+    members = snap.docs.map(function(d) { const m = d.data(); m.id = d.id; return m; });
+    members.sort(function(a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    render();
+  }, onErr));
+}
+
+function stopListening() {
+  unsubs.forEach(function(f) { f(); });
+  unsubs = [];
+  allOrders = [];
+  members = [];
+}
+
+onAuthStateChanged(auth, function(user) {
+  if (user) {
+    $('loginBox').style.display = 'none';
+    $('app').style.display = 'block';
+    startListening();
+  } else {
+    stopListening();
+    $('loginBox').style.display = 'block';
+    $('app').style.display = 'none';
+  }
+});
+
+async function doLogin() {
+  const email = $('email').value.trim();
+  const pass = $('pass').value;
+  $('loginErr').textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    $('loginErr').textContent = 'الإيميل أو كلمة السر غير صحيحة';
+  }
+}
+
+function stats() {
+  const delivered = allOrders.filter(function(o) { return o.state === 'delivered'; });
+  const sales = delivered.reduce(function(s, o) { return s + (o.subtotal || o.total || 0); }, 0);
+  const activeSubs = members.filter(isActive);
+  const income = activeSubs.reduce(function(s, m) {
+    return s + (m.type === 'driver' ? DRIVER_FEE_USD : SHOP_FEE_USD);
+  }, 0);
+  $('sOrders').textContent = allOrders.length;
+  $('sActive').textContent = allOrders.filter(function(o) { return o.state !== 'delivered'; }).length;
+  $('sSales').textContent = fmt(sales);
+  $('sSubs').textContent = activeSubs.length + ' من ' + members.length;
+  $('sIncome').textContent = '$' + income + ' (' + fmt(income * USD_RATE) + ')';
+}
+
+function render() {
+  stats();
+  $('t1').className = current === 1 ? 'active' : '';
+  $('t2').className = current === 2 ? 'active' : '';
+  $('addBox').style.display = current === 2 ? 'block' : 'none';
+  const box = $('listBox');
+
+  if (current === 1) {
+    if (allOrders.length === 0) { box.innerHTML = '<div class="empty">لا يوجد طلبات بعد</div>'; return; }
+    box.innerHTML = allOrders.map(function(o) {
+      const items = (o.items || []).map(function(i) { return esc(i.n) + ' × ' + esc(i.q); }).join('، ');
+      const driver = o.driver ? '<div class="line">🚲 السائق: ' + esc(o.driver) + '</div>' : '';
+      return '<div class="card"><span class="badge ' + esc(o.state) + '">' + esc(labels[o.state] || o.state) + '</span>' +
+        '<h3>طلب رقم ' + esc(o.id.slice(0, 6)) + '</h3>' +
+        '<div class="line">👤 ' + esc(o.customer) + ' · 📍 ' + esc(o.address) + '</div>' +
+        '<div class="line">🍽️ ' + items + '</div>' +
+        '<div class="line">💵 ' + fmt(o.total || 0) + '</div>' + driver +
+        '<button class="btn del" data-act="delOrder" data-id="' + esc(o.id) + '">حذف</button></div>';
+    }).join('');
+    return;
+  }
+
+  const list = members.map(function(m) {
+    const active = isActive(m);
+    const status = active
+      ? '<span class="badge active-sub">مفعّل حتى ' + dateText(m.paidUntil) + '</span>'
+      : '<span class="badge expired-sub">' + (m.paidUntil ? 'منتهي منذ ' + dateText(m.paidUntil) : 'غير مفعّل') + '</span>';
+    const fee = m.type === 'driver' ? DRIVER_FEE_USD : SHOP_FEE_USD;
+    const stale = m.id !== String(m.email || '').toLowerCase();
+    return '<div class="card">' + status +
+      '<h3>' + esc(m.name) + '</h3>' +
+      '<div class="line">' + (m.type === 'driver' ? '🚲 سائق' : '🍽️ محل') + ' · الاشتراك $' + fee + ' بالشهر</div>' +
+      '<div class="line">✉️ ' + esc(m.email || 'بدون إيميل') + '</div>' +
+      (stale ? '<div class="warn" style="margin:6px 0">⚠️ سجل قديم: احذفه وأضفه من جديد.</div>' : '') +
+      '<button class="btn pay" data-act="pay" data-id="' + esc(m.id) + '">تفعيل شهر (استلمت المبلغ)</button>' +
+      '<button class="btn del" data-act="delMember" data-id="' + esc(m.id) + '">حذف</button></div>';
+  }).join('');
+
+  box.innerHTML = list || '<div class="empty">لا يوجد محلات أو سائقين بعد</div>';
+}
+
+document.addEventListener('click', async function(e) {
+  const t = e.target;
+  if (t.id === 'loginBtn') { doLogin(); return; }
+  if (t.id === 'logout') { signOut(auth); return; }
+  if (t.id === 'changeRole') { localStorage.removeItem('sb_role'); location.href = 'index.html?choose=1'; return; }
+  if (t.dataset.tab) { current = Number(t.dataset.tab); render(); return; }
+  const act = t.dataset.act;
+  if (!act) return;
+
+  try {
+    if (act === 'addMember') {
+      const name = $('nm').value.trim();
+      const email = $('em').value.trim().toLowerCase();
+      const type = $('tp').value;
+      if (!name) { alert('اكتب الاسم'); return; }
+      if (email.indexOf('@') < 1) { alert('اكتب إيميل صحيح'); return; }
+      if (members.some(function(x) { return x.id === email; })) { alert('هذا الإيميل مضاف من قبل'); return; }
+      if (type === 'shop' && members.some(function(x) { return x.type === 'shop' && x.name === name; })) { alert('في محل بنفس هالاسم'); return; }
+      await setDoc(doc(db, 'members', email), { name: name, email: email, type: type, paidUntil: 0, createdAt: Date.now() });
+      $('nm').value = '';
+      $('em').value = '';
+    }
+    if (act === 'pay') {
+      const m = members.find(function(x) { return x.id === t.dataset.id; });
+      if (!m) return;
+      const base = isActive(m) ? m.paidUntil : Date.now();
+      await updateDoc(doc(db, 'members', m.id), { paidUntil: base + 30 * DAY });
+    }
+    if (act === 'delMember' && confirm('حذف نهائي؟')) {
+      await deleteDoc(doc(db, 'members', t.dataset.id));
+    }
+    if (act === 'delOrder' && confirm('هل تريد حذف هذا الطلب؟')) {
+      await deleteDoc(doc(db, 'orders', t.dataset.id));
+    }
+  } catch (err) {
+    console.error(err);
+    alert('صار خطأ: تأكد إنك داخل بإيميل المدير');
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && $('loginBox').style.display !== 'none') { doLogin(); }
+});
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+</script>
+</body>
+</html>

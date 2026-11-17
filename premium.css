@@ -1,0 +1,170 @@
+/* Sybike Brand UI — visual-only layer
+   Palette: Electric Turquoise #16C2D5 · Royal Purple #622485 · Sun Yellow #F3D007 · White
+   No JavaScript, Firebase, IDs, or business logic are changed. */
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap");
+
+:root{
+  --sb-teal:#16C2D5; --sb-teal-dk:#0b7f8c;
+  --sb-purple:#622485; --sb-purple-dk:#4a1a68; --sb-deep:#2a1140;
+  --sb-yellow:#F3D007;
+  --sb-bg:#f0fbfc; --sb-surface:#fff;
+  --sb-text:#2a1140; --sb-muted:#6f6585; --sb-line:#e2ebf1;
+  --sb-shadow:0 10px 30px rgba(42,17,64,.10);
+}
+*{box-sizing:border-box}
+html,body{min-height:100%;background:var(--sb-bg);color:var(--sb-text)}
+body{font-family:"Tajawal","Cairo",Arial,sans-serif;line-height:1.55;padding-bottom:24px}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+button:active{transform:scale(.985)}
+
+/* ---------- Header ---------- */
+header{
+ background:linear-gradient(120deg,var(--sb-purple-dk),var(--sb-purple) 70%,#7a35a0);
+ color:#fff;padding:19px 18px;text-align:center;font-size:21px;font-weight:800;
+ letter-spacing:.2px;box-shadow:0 8px 24px rgba(42,17,64,.22);position:relative;
+ border-bottom:4px solid var(--sb-teal)
+}
+#roleBtn,#logoutBtn{
+ top:14px;background:rgba(255,255,255,.16);color:#fff;
+ border:1px solid rgba(255,255,255,.28);padding:7px 12px;border-radius:11px;
+ font-size:12px;font-weight:700
+}
+#loading{text-align:center;color:var(--sb-muted);padding:70px 20px}
+
+/* ---------- Role chooser ---------- */
+#chooser{
+ display:none;flex-direction:column;min-height:100vh;max-width:none;margin:0;
+ padding:26px max(20px,calc((100vw - 520px)/2)) 26px;gap:14px;
+ background:linear-gradient(175deg,#16C2D5 0%,#1aa9cf 48%,#4a8fc4 100%)
+}
+#chooser .logo{text-align:center;margin:4px 0 0}
+#chooser .logo img{
+ width:min(300px,78vw);height:auto;object-fit:contain;border-radius:0;background:transparent;
+ padding:0;box-shadow:none;filter:drop-shadow(0 8px 14px rgba(42,17,64,.28))
+}
+#chooser h2{color:var(--sb-deep);text-align:center;font-size:28px;font-weight:900;margin:2px 0 0}
+#chooser p{text-align:center;font-size:15px;color:rgba(42,17,64,.78);margin:0 0 8px}
+.role{
+ flex:1;min-height:94px;border:0;border-radius:22px;
+ color:#fff;font-size:21px;font-weight:800;text-align:right;padding:18px 22px;
+ box-shadow:0 10px 24px rgba(42,17,64,.22);position:relative;overflow:hidden
+}
+.role:after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);left:-28px;top:-44px}
+.role small{display:block;font-size:13px;font-weight:500;opacity:.9;margin-top:4px}
+.r-customer{background:#fff;color:var(--sb-purple)}
+.r-customer:after{background:rgba(22,194,213,.14)}
+.r-restaurant{background:var(--sb-yellow);color:var(--sb-deep)}
+.r-restaurant:after{background:rgba(255,255,255,.28)}
+.r-driver{background:linear-gradient(115deg,var(--sb-purple),#7a35a0)}
+.r-admin{background:linear-gradient(115deg,var(--sb-deep),#4a1a68)}
+
+/* ---------- Login / auth ---------- */
+#authBox,#loginBox{
+ max-width:480px;margin:28px auto;padding:26px 22px;background:#fff;
+ border:1px solid var(--sb-line);border-radius:24px;box-shadow:var(--sb-shadow)
+}
+#authBox h2,#loginBox h2{text-align:center;color:var(--sb-purple);font-weight:900;margin:0 0 20px}
+#authBox input,#loginBox input,.field,.add input,.add select,.add textarea{
+ width:100%;padding:14px 15px;margin-bottom:12px;border:1px solid var(--sb-line);
+ border-radius:13px;background:#f7fcfd;font-size:15px;outline:none
+}
+#authBox input:focus,#loginBox input:focus,.field:focus,.add input:focus,.add select:focus{
+ border-color:var(--sb-teal);box-shadow:0 0 0 3px rgba(22,194,213,.22)
+}
+#authSubmit,#confirm,#loginBox button,#authBox button:not(#authToggle),.add button{
+ border:0;border-radius:13px;background:linear-gradient(110deg,var(--sb-purple-dk),var(--sb-purple));
+ color:#fff;font-size:16px;font-weight:800;box-shadow:0 8px 18px rgba(98,36,133,.25)
+}
+#authSubmit,#confirm,#loginBox button,.add button{width:100%;padding:14px}
+#authToggle{background:none;border:0;color:var(--sb-purple);font-size:14px;padding:14px;width:100%;font-weight:700}
+#authErr,#loginErr{color:#c43d4b;text-align:center;margin-top:10px}
+
+/* ---------- Layout ---------- */
+#customerApp,#app{max-width:820px;margin:0 auto}
+.sections,.tabs{display:flex;gap:10px;padding:12px 16px}
+.sections button,.tabs button{
+ flex:1;padding:13px;border:1px solid var(--sb-line);border-radius:13px;
+ background:#fff;color:var(--sb-purple);font-size:15px;font-weight:800;
+ box-shadow:0 3px 12px rgba(42,17,64,.05)
+}
+.sections button.active,.tabs button.active{background:var(--sb-purple);border-color:var(--sb-purple);color:#fff;box-shadow:0 6px 16px rgba(98,36,133,.28)}
+.list,.box{padding:10px 16px 24px}
+#customerApp .list{padding-bottom:110px}   /* keep last item clear of the cart bar */
+
+/* ---------- Cards ---------- */
+.card,.row,.ord,.order,.prod,.add,.stat,.stats .stat,#total{
+ background:#fff;border:1px solid var(--sb-line);border-radius:20px;
+ box-shadow:0 5px 18px rgba(42,17,64,.06)
+}
+.card,.row,.ord,.order,.prod,.add{padding:16px;margin:10px 12px}
+.card h3,.ord h3,.order h3,.prod h3{margin:0 0 5px;font-size:16px;color:var(--sb-purple);font-weight:800}
+.card small,.hint,.info,.addr{color:var(--sb-muted)}
+.card .price,.prod .price{color:var(--sb-purple);font-weight:900;margin-top:7px}
+.card button{
+ background:var(--sb-teal);color:var(--sb-deep);border:0;padding:10px 18px;
+ border-radius:12px;font-weight:800
+}
+.order button,.prod button,.btn{
+ background:var(--sb-purple);color:#fff;border:0;padding:10px 16px;
+ border-radius:12px;font-weight:800
+}
+.order button,.prod button{width:100%;padding:12px;margin-top:10px}
+.order button.done{background:var(--sb-teal-dk)}
+.btn.edit{background:var(--sb-purple)}.btn.del{background:#c94b55}.btn.pay{background:var(--sb-teal-dk)}
+.row .qty button{background:rgba(22,194,213,.2);color:var(--sb-purple);font-weight:900}
+.empty{text-align:center;color:var(--sb-muted);padding:34px 20px;background:#fff;border:1px dashed #cfe0e8;border-radius:20px;margin:12px}
+.topBtns{display:flex;gap:8px;margin:12px}
+.topBtns button{
+ background:#fff;color:var(--sb-purple);border:1px solid var(--sb-line);
+ padding:9px 14px;border-radius:11px;font-weight:800
+}
+.shopName,.who{color:var(--sb-purple);font-size:20px;font-weight:900;padding:14px;text-align:center}
+.sub{margin:0 12px 10px;padding:12px;border-radius:13px;text-align:center;font-weight:800}
+.sub.ok,.active-sub{background:#dff5e8;color:#1f7a4d}
+.sub.bad,.expired-sub{background:#fff0f0;color:#c43d4b}
+.stats{display:flex;flex-wrap:wrap;gap:10px;padding:12px}
+.stat{flex:1 1 130px;padding:15px;text-align:center;color:var(--sb-muted);font-size:13px}
+.stat b{display:block;font-size:22px;color:var(--sb-purple);margin-top:5px}
+.info{padding:0 12px 8px;text-align:center}
+.item,.line{padding:5px 0;color:#4d4462}
+.line a{color:var(--sb-teal-dk)}
+.addr{margin:10px 0;padding-top:10px;border-top:1px solid var(--sb-line)}
+
+/* ---------- Status badges ---------- */
+.status,.badge,.st{
+ display:inline-block;padding:5px 12px;border-radius:30px;font-size:12px;
+ font-weight:800;margin-bottom:9px;background:#efeaf4;color:#5a4a6b
+}
+.new,.st-new{background:#fff4bf;color:#7a6200}
+.cooking,.st-cooking{background:#ffe9c7;color:#9a5a00}
+.ready,.st-ready{background:#d7f6fa;color:var(--sb-teal-dk)}
+.onway,.st-onway{background:#eadcf5;color:var(--sb-purple)}
+.delivered,.st-delivered{background:#dff5e8;color:#1f7a4d}
+
+/* ---------- Cart bar & cart page ---------- */
+#cartBar{
+ position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(42,17,64,.97);
+ color:#fff;padding:12px max(16px,calc((100vw - 780px)/2));display:flex;
+ justify-content:space-between;align-items:center;font-size:14px;gap:10px;
+ box-shadow:0 -8px 28px rgba(42,17,64,.25);backdrop-filter:blur(12px)
+}
+#cartBar button{background:var(--sb-yellow);color:var(--sb-deep);border:0;padding:10px 14px;border-radius:11px;font-weight:800}
+#cartPage,#trackPage{display:none;padding:18px 16px}
+#total{padding:16px;font-size:16px;font-weight:800;line-height:2;margin:12px 0}
+#locBtn{width:100%;padding:13px;margin-bottom:10px;border:1px solid var(--sb-teal);border-radius:13px;background:#effcfd;color:var(--sb-teal-dk);font-weight:800}
+#locInfo{color:#1f7a4d;margin-bottom:10px;font-size:13px}
+#confirm:disabled,.order button:disabled{background:#b8b0c4;box-shadow:none}
+.back{background:none;border:0;color:var(--sb-purple);font-size:15px;padding:8px 0;font-weight:800}
+.warn{background:#fff8dc;color:#7a6200;padding:12px;border-radius:12px;margin:10px 12px}
+
+@media(max-width:520px){
+ #chooser{padding:22px 16px}
+ .role{min-height:86px;font-size:19px;padding:15px 18px}
+ #authBox,#loginBox{margin:16px 12px;padding:22px 16px}
+ #cartBar{padding:10px 12px}
+ #cartBar button{padding:9px 10px}
+ .sections,.tabs{padding:10px 12px;gap:7px}
+ .sections button,.tabs button{font-size:13px;padding:11px 7px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important}}
