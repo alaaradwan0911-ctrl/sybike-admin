@@ -1,5 +1,5 @@
 // غيّر رقم النسخة عند كل تحديث كبير
-const CACHE_NAME = 'sybike-admin-v1';
+const CACHE_NAME = 'sybike-admin-v2';
 const ASSETS = [
   './', './index.html', './premium.css', './manifest.json',
   './favicon.png', './apple-touch-icon.png',

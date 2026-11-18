@@ -78,6 +78,7 @@ header{
 }
 #authSubmit,#confirm,#loginBox button,.add button{width:100%;padding:14px}
 #authToggle{background:none;border:0;color:var(--sb-purple);font-size:14px;padding:14px;width:100%;font-weight:700}
+#loginBox #modeBtn{background:none;box-shadow:none;color:var(--sb-purple);font-size:14px;font-weight:700;padding:14px;margin-top:4px}
 #authErr,#loginErr{color:#c43d4b;text-align:center;margin-top:10px}
 
 /* ---------- Layout ---------- */

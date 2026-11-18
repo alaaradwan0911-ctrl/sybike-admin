@@ -71,6 +71,7 @@
     <div class="stat">كل الطلبات<b id="sOrders">0</b></div>
     <div class="stat">قيد التنفيذ<b id="sActive">0</b></div>
     <div class="stat">المبيعات المسلّمة<b id="sSales">0</b></div>
+    <div class="stat">بانتظار التفعيل<b id="sPending">0</b></div>
     <div class="stat">اشتراكات مفعّلة<b id="sSubs">0</b></div>
     <div class="stat">دخلكم من الاشتراكات المفعّلة<b id="sIncome">0</b></div>
   </div>
@@ -84,7 +85,7 @@
         <input id="nm" placeholder="الاسم (متل ما بدك الزبون يشوفه)">
         <input id="em" type="email" placeholder="إيميل دخوله">
         <select id="tp"><option value="shop">محل / مطعم (10 دولار)</option><option value="driver">سائق (5 دولار)</option></select>
-        <div class="hint">أنشئ حساب هالإيميل من فايربيس (Authentication) قبل ما تضيفه هون.</div>
+        <div class="hint">المحلات والسائقين بيسجلوا بحساباتهم من التطبيق وبيظهروا تحت تلقائياً. هالنموذج بس إذا بدك تضيف حدا يدوي (لازم تنشئ حساب إيميله من فايربيس Authentication أولاً).</div>
         <button data-act="addMember">إضافة</button>
       </div>
     </div>
@@ -150,7 +151,11 @@ function startListening() {
   }, onErr));
   unsubs.push(onSnapshot(collection(db, 'members'), function(snap) {
     members = snap.docs.map(function(d) { const m = d.data(); m.id = d.id; return m; });
-    members.sort(function(a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    members.sort(function(a, b) {
+      const pa = a.paidUntil ? 1 : 0, pb = b.paidUntil ? 1 : 0;
+      if (pa !== pb) return pa - pb;
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
     render();
   }, onErr));
 }
@@ -195,6 +200,7 @@ function stats() {
   $('sOrders').textContent = allOrders.length;
   $('sActive').textContent = allOrders.filter(function(o) { return o.state !== 'delivered'; }).length;
   $('sSales').textContent = fmt(sales);
+  $('sPending').textContent = members.filter(function(m) { return !m.paidUntil; }).length;
   $('sSubs').textContent = activeSubs.length + ' من ' + members.length;
   $('sIncome').textContent = '$' + income + ' (' + fmt(income * USD_RATE) + ')';
 }
@@ -221,18 +227,24 @@ function render() {
     return;
   }
 
+  const nameCount = {};
+  members.forEach(function(m) {
+    if (m.type === 'shop') { const k = String(m.name || '').trim().toLowerCase(); nameCount[k] = (nameCount[k] || 0) + 1; }
+  });
   const list = members.map(function(m) {
     const active = isActive(m);
+    const dup = m.type === 'shop' && nameCount[String(m.name || '').trim().toLowerCase()] > 1;
     const status = active
       ? '<span class="badge active-sub">مفعّل حتى ' + dateText(m.paidUntil) + '</span>'
       : '<span class="badge expired-sub">' + (m.paidUntil ? 'منتهي منذ ' + dateText(m.paidUntil) : 'غير مفعّل') + '</span>';
     const fee = m.type === 'driver' ? DRIVER_FEE_USD : SHOP_FEE_USD;
     const stale = m.id !== String(m.email || '').toLowerCase();
     return '<div class="card">' + status +
-      '<h3>' + esc(m.name) + '</h3>' +
+      '<h3>' + esc(m.name) + (m.paidUntil ? '' : ' <span class="badge new">جديد</span>') + '</h3>' +
       '<div class="line">' + (m.type === 'driver' ? '🚲 سائق' : '🍽️ محل') + ' · الاشتراك $' + fee + ' بالشهر</div>' +
       '<div class="line">✉️ ' + esc(m.email || 'بدون إيميل') + '</div>' +
       (stale ? '<div class="warn" style="margin:6px 0">⚠️ سجل قديم: احذفه وأضفه من جديد.</div>' : '') +
+      (dup ? '<div class="warn" style="margin:6px 0">⚠️ في محل ثاني بنفس الاسم. لا تفعّله قبل ما تتأكد، لأن الاسم هو اللي بيربط الطلبات بالمحل.</div>' : '') +
       '<button class="btn pay" data-act="pay" data-id="' + esc(m.id) + '">تفعيل شهر (استلمت المبلغ)</button>' +
       '<button class="btn del" data-act="delMember" data-id="' + esc(m.id) + '">حذف</button></div>';
   }).join('');
